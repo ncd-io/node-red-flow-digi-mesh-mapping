@@ -1,0 +1,659 @@
+[
+    {
+        "id": "924c2dbe31062c26",
+        "type": "tab",
+        "label": "DigiMesh Tracert Tool",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "3ac04663e3fdd8b2",
+        "type": "ncd-gateway-node",
+        "z": "924c2dbe31062c26",
+        "name": "",
+        "connection": "1869a2ff19ac52a0",
+        "unknown_devices": 0,
+        "outputs": 1,
+        "x": 210,
+        "y": 180,
+        "wires": [
+            [
+                "6a54fee8f94e8446"
+            ]
+        ]
+    },
+    {
+        "id": "6a54fee8f94e8446",
+        "type": "switch",
+        "z": "924c2dbe31062c26",
+        "name": "",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "route_info",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "link_info",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "sensor_mode",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 390,
+        "y": 180,
+        "wires": [
+            [
+                "9f3fb6f61454399a",
+                "d407bb5e13d018c1"
+            ],
+            [
+                "1ee2b8393d5685e4",
+                "127b0b557387fcfc"
+            ],
+            [
+                "7fea75a3fafee5cc",
+                "52c2bb3f3afd1fd3"
+            ]
+        ]
+    },
+    {
+        "id": "9f3fb6f61454399a",
+        "type": "debug",
+        "z": "924c2dbe31062c26",
+        "name": "Route Info",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "1ee2b8393d5685e4",
+        "type": "debug",
+        "z": "924c2dbe31062c26",
+        "name": "Link Info",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "d407bb5e13d018c1",
+        "type": "function",
+        "z": "924c2dbe31062c26",
+        "name": "Set Route",
+        "func": "var routes = flow.get(\"routes\");\nvar map_requests = flow.get(\"request_map\");\n\nvar sensorAddress = msg.payload.route[msg.payload.route.length-1];\n\nroutes[sensorAddress] = msg.payload;\n\nmap_requests[sensorAddress] = 1;\n\nflow.set(\"request_map\",map_requests);\nflow.set(\"routes\",routes);\n\n//Add repeaters to context\nif(msg.payload.route.length > 2){\n    var repeaters = flow.get(\"repeaters\");\n    var route = msg.payload.route;\n\n    for(var i = 1; i < route.length-1; i++){\n        if (!repeaters.includes(route[i])) {\n            repeaters.push(route[i]);\n        }\n    }\n    flow.set(\"repeaters\",repeaters);\n}\n\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f321675423f05d7c",
+        "type": "inject",
+        "z": "924c2dbe31062c26",
+        "name": "Initiate Globals",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 120,
+        "y": 900,
+        "wires": [
+            [
+                "46ed16b191b42578"
+            ]
+        ]
+    },
+    {
+        "id": "46ed16b191b42578",
+        "type": "change",
+        "z": "924c2dbe31062c26",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "routes",
+                "pt": "flow",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "links",
+                "pt": "flow",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "mesh_maps",
+                "pt": "flow",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "fly_sensors",
+                "pt": "flow",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "request_map",
+                "pt": "flow",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "repeaters",
+                "pt": "flow",
+                "to": "[]",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "focus_sensor",
+                "pt": "flow",
+                "to": "",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 320,
+        "y": 900,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "127b0b557387fcfc",
+        "type": "function",
+        "z": "924c2dbe31062c26",
+        "name": "Set Links",
+        "func": "var source_address = msg.payload.source_address;\nvar destination = msg.payload.destination;\n\nvar links = flow.get(\"links\");\n\nvar quality = { \"max_rssi\" : msg.payload.max_rssi, \"min_rssi\":msg.payload.min_rssi, \"avg_rssi\":msg.payload.avg_rssi};\n\nif (!links.hasOwnProperty(source_address)){\n    links[source_address] = {};\n}\nif (!links.hasOwnProperty(destination)) {\n    links[destination] = {};\n}\n\nlinks[source_address][destination] = quality;\nlinks[destination][source_address] = quality;\n\nflow.set(\"links\",links);\n\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dfaf3b9a2f22a4a1",
+        "type": "function",
+        "z": "924c2dbe31062c26",
+        "name": "Create Mesh_Map",
+        "func": "var sensor_mac = flow.get(\"focus_sensor\");\nif(sensor_mac.length == 0){\n    return null;\n}\nvar routes = flow.get(\"routes\");\nvar links = flow.get(\"links\");\nvar mesh_maps = flow.get(\"mesh_maps\");\n\n\nif(!routes.hasOwnProperty(sensor_mac)){\n    return null;\n}\n\nvar route = routes[sensor_mac].route;\n\n\nvar documented_route = [];\nfor(var i = 0; i < route.length-1; i++){\n    if (links.hasOwnProperty(route[i])){\n        var link = links[route[i]];\n        var source = route[i];\n        if (link.hasOwnProperty(route[i+1])){\n            var destination = route[i+1];\n            var signal = link[destination];\n            documented_route[i] = { \"source\":source, \"destination\":destination, \"signal\":signal};\n        }else{\n            return null;\n        }\n    }else{\n        return null;\n    }\n}\nif(!mesh_maps.hasOwnProperty(sensor_mac)){\n    mesh_maps[sensor_mac] = [];\n}\nmesh_maps[sensor_mac] = documented_route;\nflow.set(\"mesh_maps\",mesh_maps);\nmsg.payload = documented_route;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 660,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "58ee9d18.5e3a24",
+        "type": "ui_template",
+        "z": "924c2dbe31062c26",
+        "group": "c66e43b3fe1a9276",
+        "name": "testing payload",
+        "order": 0,
+        "width": "24",
+        "height": "24",
+        "format": "<style>\n    #ncd-text-flow{\n        display: flex;\n        justify-content: space-evenly;\n        align-items: center;\n    }\n    #ncd-text-flow div{\n        border: 1px solid grey;\n        padding: 6px;\n        text-align: center;\n    }\n</style>\n<script>\n    (function(scope) {\n        console.log('Position 1');\n        console.dir(scope);\n        console.log(scope.msg);\n        scope.$watch('msg.payload', function(data) {\n            console.log('Position 2');\n            console.dir(data);\n            let myhtml = \"\";\n            for(var item in data){\n                var label = \"\";\n                if(item == 0){\n                    label = \"Gateway\";\n                }else if(item != data.length-1){\n                    label = \"Repeater\";\n                }else{\n                    label = \"Sensor\"\n                }\n                console.log('Fire 2')\n                console.log(data.length);\n                if(item == data.length-1){\n                    myhtml+=\"<div>\";\n                    myhtml+=data[item]['signal']['avg_rssi'];\n                    myhtml+=\"</div>\";\n                    myhtml+=\"<div>\";\n                    myhtml += label + \"<br>\"\n                    myhtml += data[item]['destination']+\"<br>\";\n                    myhtml+=\"</div>\";\n                    \n                }else{\n                    myhtml+=\"<div>\";\n                    myhtml += label + \"<br>\"\n                    myhtml += data[item]['source']+\"<br>\";\n                    myhtml+=\"</div>\";\n                    myhtml+=\"<div>\";\n                    myhtml+=data[item]['signal']['avg_rssi'];\n                    myhtml+=\"</div>\";\n                    myhtml+=\"<div>\";\n                    myhtml += \"Repeater <br>\"\n                    myhtml += data[item]['destination']+\"<br>\";\n                    myhtml+=\"</div>\";\n                }\n                \n            }\n            document.getElementById('ncd-text-flow').innerHTML = myhtml;\n        });\n        \n    })(scope);\n    document.onload = function(){\n        let myhtml = \"\";\n        \n    }\n    \n</script>\n<!-- <div layout=\"row\" layout-align=\"start center\">\n    <span flex>RPM Min</span>\n    <span flex>RPM Max</span>\n    <span flex>Failure Prob</span>\n    <span flex>Machine type</span>\n</div>\n<div layout=\"row\" layout-align=\"start center\" ng-repeat=\"machine in msg.payload.factory\">\n    <span flex style=\"color: green\">{{machine.min}}</span>\n    <span flex style=\"color: red\">{{machine.max}}</span>\n    <span flex style=\"color: black\">{{machine.failProb}}%</span>\n    <span flex style=\"color: black\">{{machine.name}}</span>\n</div> -->\n\n<div id=\"ncd-text-flow\">\n\n</div>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 500,
+        "y": 580,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "97cc97a794d0b40d",
+        "type": "function",
+        "z": "924c2dbe31062c26",
+        "name": "Monitor Mesh Map",
+        "func": "var sensor_mac = flow.get(\"focus_sensor\");\nvar mesh_maps = flow.get(\"mesh_maps\");\n\nif (sensor_mac.length == 0 || Object.keys(mesh_maps).length == 0){\n    return null;\n}\n\nif(!mesh_maps.hasOwnProperty(sensor_mac)){\n    return null;\n}\nvar mesh_map = mesh_maps[sensor_mac];\nvar gateway_mac = flow.get(\"gateway_mac\");\nvar hops = [];\n\nmsg.payload = mesh_map;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 290,
+        "y": 620,
+        "wires": [
+            [
+                "58ee9d18.5e3a24",
+                "997667070592fe7b"
+            ]
+        ]
+    },
+    {
+        "id": "7fea75a3fafee5cc",
+        "type": "debug",
+        "z": "924c2dbe31062c26",
+        "name": "debug 12",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "52c2bb3f3afd1fd3",
+        "type": "function",
+        "z": "924c2dbe31062c26",
+        "name": "Add Fly Sensors",
+        "func": "if(msg.payload.mode == \"FLY\"){\n    var fly_sensors = flow.get(\"fly_sensors\");\n    fly_sensors[msg.payload.mac] = { \"type\": msg.payload.type, \"last_heard\": msg.payload.lastHeard};\n    flow.set(\"fly_sensors\",fly_sensors);\n    return msg;\n}\nreturn null;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 280,
+        "wires": [
+            [
+                "406a2744c856033e"
+            ]
+        ]
+    },
+    {
+        "id": "406a2744c856033e",
+        "type": "function",
+        "z": "924c2dbe31062c26",
+        "name": "Perform Mesh Test?",
+        "func": "var map_requests = flow.get(\"request_map\");\n\n//No map request for this sensor pending\nif (!map_requests.hasOwnProperty(msg.payload.mac)){\n    return null;\n}\n\nvar command = [244, 79, 0, 0, 101, 50];\nvar request = { \"address\": msg.payload.mac, \"data\": command };\nvar msg1 = { \"topic\": \"route_trace\", \"payload\": request};\n\nreturn msg1;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 280,
+        "wires": [
+            [
+                "0198b87606319d30",
+                "91721b311ba84484"
+            ]
+        ]
+    },
+    {
+        "id": "0a0f116f4364d88e",
+        "type": "link in",
+        "z": "924c2dbe31062c26",
+        "name": "link in 4",
+        "links": [
+            "0198b87606319d30"
+        ],
+        "x": 45,
+        "y": 160,
+        "wires": [
+            [
+                "3ac04663e3fdd8b2"
+            ]
+        ]
+    },
+    {
+        "id": "0198b87606319d30",
+        "type": "link out",
+        "z": "924c2dbe31062c26",
+        "name": "link out 4",
+        "mode": "link",
+        "links": [
+            "0a0f116f4364d88e"
+        ],
+        "x": 1015,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "60b577e2214657c3",
+        "type": "function",
+        "z": "924c2dbe31062c26",
+        "name": "function 7",
+        "func": "var request_map = flow.get(\"request_map\");\n\nif(!request_map.hasOwnProperty(msg.payload)){\n    request_map[msg.payload] = 0;\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2a77ee70a4f6ffe9",
+        "type": "function",
+        "z": "924c2dbe31062c26",
+        "name": "Call Link Test",
+        "func": "var routes = flow.get(\"routes\");\nvar route = routes[msg.payload.address].route;\nnode.warn(route);\nvar addrs = { \"source_address\": route[route.length - 2], \"destination_address\": route[route.length - 1] };\n\nvar linkMSG = { \"topic\": \"link_test\", \"payload\": addrs};\n\nreturn linkMSG;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1230,
+        "y": 300,
+        "wires": [
+            [
+                "a483f3b32f94b053"
+            ]
+        ]
+    },
+    {
+        "id": "a483f3b32f94b053",
+        "type": "link out",
+        "z": "924c2dbe31062c26",
+        "name": "link out 6",
+        "mode": "link",
+        "links": [
+            "a1accd5bb5d30510"
+        ],
+        "x": 1365,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "a1accd5bb5d30510",
+        "type": "link in",
+        "z": "924c2dbe31062c26",
+        "name": "link in 6",
+        "links": [
+            "a483f3b32f94b053",
+            "22c1607dc5d8f6b4"
+        ],
+        "x": 45,
+        "y": 200,
+        "wires": [
+            [
+                "3ac04663e3fdd8b2"
+            ]
+        ]
+    },
+    {
+        "id": "91721b311ba84484",
+        "type": "delay",
+        "z": "924c2dbe31062c26",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "4",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1060,
+        "y": 300,
+        "wires": [
+            [
+                "2a77ee70a4f6ffe9"
+            ]
+        ]
+    },
+    {
+        "id": "a06c5786bc723d12",
+        "type": "function",
+        "z": "924c2dbe31062c26",
+        "name": "Repeater Links",
+        "func": "var routes = flow.get(\"routes\");\nvar links = flow.get(\"links\");\n\nfor(var key in routes){\n    var r = routes[key];\n    var ar = r.route;\n    if(ar.length > 2){\n        for(var i = 0; i < ar.length-1; i++){\n            //check links to non sensors\n            var repeater = ar[i+1];\n            var neighbor = ar[i];\n            if (links.hasOwnProperty(repeater)){\n                var repeaterLinks = links[repeater];\n                if (!repeaterLinks.hasOwnProperty(neighbor)){\n                    var linkMSG = {\"topic\":\"link_test\",\"payload\":{\"source_address\" : repeater, \"destination_address\" : neighbor}};\n                    return linkMSG;\n                }\n            }\n        }\n    }\n}\n\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 700,
+        "wires": [
+            [
+                "22c1607dc5d8f6b4"
+            ]
+        ]
+    },
+    {
+        "id": "22c1607dc5d8f6b4",
+        "type": "link out",
+        "z": "924c2dbe31062c26",
+        "name": "link out 7",
+        "mode": "link",
+        "links": [
+            "a1accd5bb5d30510"
+        ],
+        "x": 415,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "42159cbed239733f",
+        "type": "ui_text_input",
+        "z": "924c2dbe31062c26",
+        "name": "",
+        "label": "Sensor Address",
+        "tooltip": "00:13:a2:00:42:36:d6:25",
+        "group": "c66e43b3fe1a9276",
+        "order": 2,
+        "width": "6",
+        "height": "1",
+        "passthru": true,
+        "mode": "text",
+        "delay": "0",
+        "topic": "topic",
+        "sendOnBlur": false,
+        "className": "",
+        "topicType": "msg",
+        "x": 100,
+        "y": 420,
+        "wires": [
+            [
+                "e54c12dbd029c481"
+            ]
+        ]
+    },
+    {
+        "id": "98f1eeeeded47f05",
+        "type": "inject",
+        "z": "924c2dbe31062c26",
+        "name": "Loop",
+        "props": [],
+        "repeat": "5",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "",
+        "x": 90,
+        "y": 660,
+        "wires": [
+            [
+                "97cc97a794d0b40d",
+                "dfaf3b9a2f22a4a1",
+                "a06c5786bc723d12"
+            ]
+        ]
+    },
+    {
+        "id": "e54c12dbd029c481",
+        "type": "change",
+        "z": "924c2dbe31062c26",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "focus_sensor",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 320,
+        "y": 420,
+        "wires": [
+            [
+                "60b577e2214657c3"
+            ]
+        ]
+    },
+    {
+        "id": "997667070592fe7b",
+        "type": "change",
+        "z": "924c2dbe31062c26",
+        "name": "Sensor Route Trace Complete",
+        "rules": [
+            {
+                "t": "set",
+                "p": "focus_sensor",
+                "pt": "flow",
+                "to": "",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c3d751ce7e14f87f",
+        "type": "comment",
+        "z": "924c2dbe31062c26",
+        "name": "Initialize Flow Variables On Deploy",
+        "info": "",
+        "x": 160,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "892ba87c4201c31f",
+        "type": "comment",
+        "z": "924c2dbe31062c26",
+        "name": "Loop these functions for background tasks",
+        "info": "",
+        "x": 180,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "7f3aac3a6348fe89",
+        "type": "comment",
+        "z": "924c2dbe31062c26",
+        "name": "User Inputs Sensor Address",
+        "info": "",
+        "x": 140,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "f9b43cd356f1589a",
+        "type": "comment",
+        "z": "924c2dbe31062c26",
+        "name": "Handle all DigiMesh Communication",
+        "info": "",
+        "x": 160,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "1869a2ff19ac52a0",
+        "type": "ncd-gateway-config",
+        "name": "Zigmo",
+        "comm_type": "serial",
+        "ip_address": "",
+        "tcp_port": "2101",
+        "port": "/dev/tty.usbserial-AB0JTRX6",
+        "baudRate": "115200",
+        "pan_id": "7FFF",
+        "rssi": true
+    },
+    {
+        "id": "c66e43b3fe1a9276",
+        "type": "ui_group",
+        "name": "Mesh Map",
+        "tab": "f1f5b1da9a52a5bf",
+        "order": 1,
+        "disp": true,
+        "width": "24",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "f1f5b1da9a52a5bf",
+        "type": "ui_tab",
+        "name": "Mesh Map",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
